@@ -1,8 +1,8 @@
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
-  color: white;
+  background: linear-gradient(135deg, #ffffff, #d3d3d3); /* Changed background to a lighter color */
+  color: #000000; /* Changed text color to black */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -23,8 +23,8 @@ body {
 }
 
 .button {
-  background-color: #6495ed;
-  color: white;
+  background-color: #000000; /* Changed button background to black */
+  color: #ffffff; /* Changed button text color to white */
   padding: 15px;
   border: none;
   border-radius: 5px;
@@ -38,7 +38,7 @@ body {
 
 .progress {
   width: 100%;
-  background: #333;
+  background: #000000; /* Changed progress background to black */
   border-radius: 5px;
   height: 10px;
 }
