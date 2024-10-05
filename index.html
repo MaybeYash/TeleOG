@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Reward</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Welcome Screen -->
+  <div id="welcomeScreen" class="screen">
+    <div class="content">
+      <img src="duck.png" alt="Duck Image" class="duck-image">
+      <h1>👋 Hey!</h1>
+      <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
+      <button id="startButton" class="button">Let's go →</button>
+    </div>
+  </div>
+
+  <!-- Checking Progress Screen -->
+  <div id="progressScreen" class="screen hidden">
+    <h1>Checking your account</h1>
+    <div class="progress-bar">
+      <span>Account Age Verified</span>
+      <div class="progress"><div class="progress-fill" id="progress1"></div></div>
+    </div>
+    <div class="progress-bar">
+      <span>Activity Level Analyzed</span>
+      <div class="progress"><div class="progress-fill" id="progress2"></div></div>
+    </div>
+    <div class="progress-bar">
+      <span>Telegram Premium Checked</span>
+      <div class="progress"><div class="progress-fill" id="progress3"></div></div>
+    </div>
+    <div class="progress-bar">
+      <span>OG Status Confirmed</span>
+      <div class="progress"><div class="progress-fill" id="progress4"></div></div>
+    </div>
+  </div>
+
+  <!-- Final Screen -->
+  <div id="finalScreen" class="screen hidden">
+    <h1>Newbie member!</h1>
+    <h2 id="joinYear">1</h2>
+    <p>Years ago</p>
+    <p>You've joined Telegram.</p>
+    <button class="button">Continue</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
