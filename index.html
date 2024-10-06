@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Join Date Checker</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: white;
+      font-family: 'Arial', sans-serif;
+    }
+    .hidden { display: none; }
+    .center {
+      text-align: center;
+    }
+    .button {
+      background: linear-gradient(to right, #1fa2ff, #12d8fa, #a6ffcb);
+      border: none;
+      padding: 15px 30px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .button:hover {
+      background: linear-gradient(to right, #12d8fa, #1fa2ff, #a6ffcb);
+    }
+  </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <!-- Welcome Screen -->
+  <div id="welcome-screen" class="center">
+    <h1>👋 Hey!</h1>
+    <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
+    
+    <!-- Image in the middle of the welcome section -->
+    <img src="reward-image.png" alt="Reward Image" style="width: 200px; margin: 20px 0;">
+    
+    <button class="button" onclick="startVerification()">Let's go →</button>
+  </div>
+
+  <!-- Verification Screen -->
+  <div id="verification-screen" class="hidden center">
+    <h1>Checking your account...</h1>
+    <div class="progress-bar">
+      <div id="progress-fill" class="progress-fill">0%</div>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen" class="hidden center">
+    <h1 id="join-status"></h1>
+    <button class="button" onclick="resetApp()">Continue</button>
+  </div>
+
+  <script>
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const verificationScreen = document.getElementById('verification-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const progressFill = document.getElementById('progress-fill');
+    const joinStatus = document.getElementById('join-status');
+
+    let userId = null;
+
+    // Function to start verification process
+    function startVerification() {
+      welcomeScreen.classList.add('hidden');
+      verificationScreen.classList.remove('hidden');
+
+      // Simulate verification progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        progressFill.style.width = progress + '%';
+        progressFill.textContent = progress + '%';
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          getJoinDate();
+        }
+      }, 300);
+    }
+
+    // Function to get join date from the server
+    function getJoinDate() {
+      if (!window.Telegram.WebApp.initDataUnsafe) {
+        alert("This app only works within Telegram!");
+        return;
+      }
+
+      userId = Telegram.WebApp.initDataUnsafe.user.id;
+      verificationScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+
+      // Fetch the join date using the API
+      fetch("https://restore-access.indream.app/regdate", {
+        method: "POST",
+        headers: {
+          "accept": "*/*",
+          "content-type": "application/x-www-form-urlencoded",
+          "x-api-key": "e758fb28-79be-4d1c-af6b-066633ded128",
+        },
+        body: JSON.stringify({ telegramId: userId }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        const joinDate = data?.data?.date || "N/A";
+        if (joinDate !== "N/A") {
+          const [joinYear, joinMonth] = joinDate.split('-').map(Number);
+          const now = new Date();
+          let years = now.getFullYear() - joinYear;
+          let months = now.getMonth() - joinMonth;
+
+          if (months < 0) {
+            years -= 1;
+            months += 12;
+          }
+
+          joinStatus.textContent = `You've joined Telegram approximately ${years} year${years > 1 ? 's' : ''} and ${months} month${months > 1 ? 's' : ''} ago!`;
+        } else {
+          joinStatus.textContent = "Could not retrieve your join date.";
+        }
+      });
+    }
+
+    // Reset app state
+    function resetApp() {
+      resultScreen.classList.add('hidden');
+      welcomeScreen.classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
