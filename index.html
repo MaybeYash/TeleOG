@@ -105,7 +105,7 @@
       welcomeScreen.style.display = 'none';
       verificationScreen.style.display = 'block';
       simulateProgress(accountProgressFill, () => {
-        simulateProgress(premiumProgressFill, getJoinDate);
+        simulateProgress(premiumProgressFill, checkJoinDate);
       });
     }
 
@@ -122,45 +122,26 @@
       }, 300);
     }
 
-    // Function to get join date from the server
-    function getJoinDate() {
+    // Function to check join date from the new API
+    function checkJoinDate() {
       userId = Telegram.WebApp.initDataUnsafe.user.id;
       verificationScreen.style.display = 'none';
       resultScreen.style.display = 'block';
 
-      fetch("https://restore-access.indream.app/regdate", {
-        method: "POST",
+      fetch(`https://checking-join.vercel.app/check?user=${userId}`, {
+        method: "GET",
         headers: {
           "accept": "*/*",
-          "content-type": "application/json",
-          "x-api-key": "e758fb28-79be-4d1c-af6b-066633ded128",
         },
-        body: JSON.stringify({ telegramId: userId }),
       })
       .then(response => response.json())
       .then(data => {
-        const joinDate = data?.data?.date || "N/A";
-        if (joinDate !== "N/A") {
-          const [joinYear, joinMonth] = joinDate.split('-').map(Number);
-          const joinDateObj = luxon.DateTime.fromObject({ year: joinYear, month: joinMonth, day: 1 });
-          const now = luxon.DateTime.now();
-
-          let diffYears = now.year - joinDateObj.year;
-          let diffMonths = now.month - joinDateObj.month;
-
-          if (diffMonths < 0) {
-            diffYears -= 1;
-            diffMonths += 12;
-          }
-
-          if (diffYears > 0) {
-            joinStatus.textContent = `You've joined Telegram approximately ${diffYears} year${diffYears > 1 ? 's' : ''} and ${diffMonths} month${diffMonths > 1 ? 's' : ''} ago!`;
-          } else {
-            joinStatus.textContent = `You've joined Telegram approximately ${diffMonths} month${diffMonths > 1 ? 's' : ''} ago!`;
-          }
-        } else {
-          joinStatus.textContent = "Could not retrieve your join date.";
-        }
+        const message = data?.message || "Could not retrieve your join date.";
+        joinStatus.textContent = message; // Display the message directly
+      })
+      .catch(error => {
+        joinStatus.textContent = "Error retrieving join date.";
+        console.error(error);
       });
     }
 
