@@ -48,6 +48,9 @@
       border-radius: 10px 0 0 10px;
       transition: width 0.5s ease;
     }
+    .hidden {
+      display: none;
+    }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -85,8 +88,9 @@
 
     // Function to start verification process
     function startVerification() {
-      welcomeScreen.classList.add('hidden');
-      verificationScreen.classList.remove('hidden');
+      // Hide welcome screen and show verification screen
+      welcomeScreen.style.display = 'none';
+      verificationScreen.style.display = 'block';
 
       // Simulate verification progress
       let progress = 0;
@@ -105,8 +109,8 @@
     // Function to get join date from the server
     function getJoinDate() {
       userId = Telegram.WebApp.initDataUnsafe.user.id;
-      verificationScreen.classList.add('hidden');
-      resultScreen.classList.remove('hidden');
+      verificationScreen.style.display = 'none';
+      resultScreen.style.display = 'block';
 
       // Fetch the join date using the API
       fetch("https://restore-access.indream.app/regdate", {
@@ -141,8 +145,8 @@
 
     // Reset app state
     function resetApp() {
-      resultScreen.classList.add('hidden');
-      welcomeScreen.classList.remove('hidden');
+      resultScreen.style.display = 'none';
+      welcomeScreen.style.display = 'block';
     }
   </script>
 </body>
