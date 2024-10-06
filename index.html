@@ -27,6 +27,7 @@
       font-size: 16px;
       cursor: pointer;
       margin-top: 20px;
+      border-radius: 25px; /* Rounded corners for the button */
     }
     .button:hover {
       background: linear-gradient(to right, #12d8fa, #1fa2ff, #a6ffcb);
@@ -37,12 +38,14 @@
 <body>
   <!-- Welcome Screen -->
   <div id="welcome-screen" class="center">
+    
+    <!-- Image placed above the welcome text -->
+    <img src="reward-image.png" alt="Reward Image" style="width: 200px; margin: 20px 0;">
+    
     <h1>👋 Hey!</h1>
     <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
     
-    <!-- Image in the middle of the welcome section -->
-    <img src="reward-image.png" alt="Reward Image" style="width: 200px; margin: 20px 0;">
-    
+    <!-- Button placed below the welcome text -->
     <button class="button" onclick="startVerification()">Let's go →</button>
   </div>
 
