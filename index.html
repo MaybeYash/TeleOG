@@ -3,50 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Reward</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Telegram Join Date Checker</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: white;
+      font-family: 'Arial', sans-serif;
+    }
+    .hidden { display: none; }
+    .center {
+      text-align: center;
+    }
+    .button {
+      background: linear-gradient(to right, #1fa2ff, #12d8fa, #a6ffcb);
+      border: none;
+      padding: 15px 30px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .button:hover {
+      background: linear-gradient(to right, #12d8fa, #1fa2ff, #a6ffcb);
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #3d3d3d;
+      border-radius: 20px;
+      margin-top: 20px;
+    }
+    .progress-fill {
+      height: 25px;
+      width: 0;
+      background: linear-gradient(to right, #34e89e, #0f3443);
+      border-radius: 20px;
+      text-align: center;
+      line-height: 25px;
+    }
+  </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <!-- Welcome Screen -->
-  <div id="welcomeScreen" class="screen">
-    <div class="content">
-      <img src="duck.png" alt="Duck Image" class="duck-image">
-      <h1>👋 Hey!</h1>
-      <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
-      <button id="startButton" class="button">Let's go →</button>
+  <div id="welcome-screen" class="center">
+    <h1>👋 Hey!</h1>
+    <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
+    <button class="button" onclick="startVerification()">Let's go →</button>
+  </div>
+
+  <!-- Verification Screen -->
+  <div id="verification-screen" class="hidden center">
+    <h1>Checking your account...</h1>
+    <div class="progress-bar">
+      <div id="progress-fill" class="progress-fill">0%</div>
     </div>
   </div>
 
-  <!-- Checking Progress Screen -->
-  <div id="progressScreen" class="screen hidden">
-    <h1>Checking your account</h1>
-    <div class="progress-bar">
-      <span>Account Age Verified</span>
-      <div class="progress"><div class="progress-fill" id="progress1"></div></div>
-    </div>
-    <div class="progress-bar">
-      <span>Activity Level Analyzed</span>
-      <div class="progress"><div class="progress-fill" id="progress2"></div></div>
-    </div>
-    <div class="progress-bar">
-      <span>Telegram Premium Checked</span>
-      <div class="progress"><div class="progress-fill" id="progress3"></div></div>
-    </div>
-    <div class="progress-bar">
-      <span>OG Status Confirmed</span>
-      <div class="progress"><div class="progress-fill" id="progress4"></div></div>
-    </div>
+  <!-- Result Screen -->
+  <div id="result-screen" class="hidden center">
+    <h1 id="join-status"></h1>
+    <button class="button" onclick="resetApp()">Continue</button>
   </div>
 
-  <!-- Final Screen -->
-  <div id="finalScreen" class="screen hidden">
-    <h1>Newbie member!</h1>
-    <h2 id="joinYear">1</h2>
-    <p>Years ago</p>
-    <p>You've joined Telegram.</p>
-    <button class="button">Continue</button>
-  </div>
+  <script>
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const verificationScreen = document.getElementById('verification-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const progressFill = document.getElementById('progress-fill');
+    const joinStatus = document.getElementById('join-status');
 
-  <script src="script.js"></script>
+    let userId = null;
+
+    // Function to start verification process
+    function startVerification() {
+      welcomeScreen.classList.add('hidden');
+      verificationScreen.classList.remove('hidden');
+
+      // Simulate verification progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        progressFill.style.width = progress + '%';
+        progressFill.textContent = progress + '%';
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          getJoinDate();
+        }
+      }, 300);
+    }
+
+    // Function to get join date from the server
+    function getJoinDate() {
+      if (!window.Telegram.WebApp.initDataUnsafe) {
+        alert("This app only works within Telegram!");
+        return;
+      }
+
+      userId = Telegram.WebApp.initDataUnsafe.user.id;
+      verificationScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+
+      // Fetch the join date using the API
+      fetch("https://restore-access.indream.app/regdate", {
+        method: "POST",
+        headers: {
+          "accept": "*/*",
+          "content-type": "application/x-www-form-urlencoded",
+          "x-api-key": "e758fb28-79be-4d1c-af6b-066633ded128",
+        },
+        body: JSON.stringify({ telegramId: userId }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        const joinDate = data?.data?.date || "N/A";
+        if (joinDate !== "N/A") {
+          const [joinYear, joinMonth] = joinDate.split('-').map(Number);
+          const now = new Date();
+          let years = now.getFullYear() - joinYear;
+          let months = now.getMonth() - joinMonth;
+
+          if (months < 0) {
+            years -= 1;
+            months += 12;
+          }
+
+          joinStatus.textContent = `You've joined Telegram approximately ${years} year${years > 1 ? 's' : ''} and ${months} month${months > 1 ? 's' : ''} ago!`;
+        } else {
+          joinStatus.textContent = "Could not retrieve your join date.";
+        }
+      });
+    }
+
+    // Reset app state
+    function resetApp() {
+      resultScreen.classList.add('hidden');
+      welcomeScreen.classList.remove('hidden');
+    }
+  </script>
 </body>
 </html>
