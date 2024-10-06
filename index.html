@@ -15,7 +15,6 @@
       color: white;
       font-family: 'Arial', sans-serif;
     }
-    .hidden { display: none; }
     .center {
       text-align: center;
     }
@@ -49,43 +48,21 @@
       border-radius: 10px 0 0 10px;
       transition: width 0.5s ease;
     }
-    .browser-warning {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000000; /* Solid black background */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: red;
-      text-align: center;
-      font-size: 24px;
-    }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <!-- Browser Warning Screen -->
-  <div id="browser-warning" class="browser-warning hidden">
-    🐿️ Open in Telegram!
-  </div>
-
   <!-- Welcome Screen -->
   <div id="welcome-screen" class="center">
-    <!-- Image placed above the welcome text and slightly adjusted down -->
     <img src="reward-image.png" alt="Reward Image" style="width: 200px; margin: 40px 0 20px 0;">
     <h1>👋 Hey!</h1>
     <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
-    <!-- Button placed below the welcome text -->
     <button class="button" onclick="startVerification()">Let's go →</button>
   </div>
 
   <!-- Verification Screen -->
   <div id="verification-screen" class="hidden center">
     <h1>Checking your account...</h1>
-    <!-- Progress Bar -->
     <div class="progress-bar">
       <div id="progress-fill" class="progress-fill">0%</div>
     </div>
@@ -103,24 +80,8 @@
     const resultScreen = document.getElementById('result-screen');
     const progressFill = document.getElementById('progress-fill');
     const joinStatus = document.getElementById('join-status');
-    const browserWarning = document.getElementById('browser-warning');
 
     let userId = null;
-
-    // Correct detection for Telegram environment
-    document.addEventListener("DOMContentLoaded", () => {
-      if (!window.Telegram.WebApp.initData) {
-        // If not in Telegram, show the browser warning
-        browserWarning.classList.remove('hidden');
-        document.body.style.background = '#000000'; // Set a solid black background
-        welcomeScreen.classList.add('hidden'); // Hide other screens
-        verificationScreen.classList.add('hidden');
-        resultScreen.classList.add('hidden');
-      } else {
-        // If in Telegram, proceed normally
-        browserWarning.classList.add('hidden');
-      }
-    });
 
     // Function to start verification process
     function startVerification() {
@@ -143,11 +104,6 @@
 
     // Function to get join date from the server
     function getJoinDate() {
-      if (!window.Telegram.WebApp.initData) {
-        alert("This app only works within Telegram!");
-        return;
-      }
-
       userId = Telegram.WebApp.initDataUnsafe.user.id;
       verificationScreen.classList.add('hidden');
       resultScreen.classList.remove('hidden');
