@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Join Date Checker</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: white;
+      font-family: 'Arial', sans-serif;
+    }
+    .center {
+      text-align: center;
+    }
+    .button {
+      background: linear-gradient(to right, #1fa2ff, #12d8fa, #a6ffcb);
+      border: none;
+      padding: 15px 30px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      border-radius: 25px;
+    }
+    .button:hover {
+      background: linear-gradient(to right, #12d8fa, #1fa2ff, #a6ffcb);
+    }
+    .progress-bar {
+      width: 60%;
+      background: #555;
+      border-radius: 10px;
+      margin: 10px auto;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 20px;
+      background: linear-gradient(to right, #a1c4fd, #c2e9fb);
+      width: 0%;
+      border-radius: 10px 0 0 10px;
+      transition: width 0.5s ease;
+    }
+    .hidden {
+      display: none;
+    }
+    .large-text {
+      font-size: 28px;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.0.1/luxon.min.js"></script>
+</head>
+<body>
+  <!-- Welcome Screen -->
+  <div id="welcome-screen" class="center">
+    <img src="reward-image.png" alt="Reward Image" style="width: 200px; margin: 40px 0 20px 0;">
+    <h1>👋 Hey!</h1>
+    <p>You've been using Telegram for a while, now it's time to get rewarded!</p>
+    <button class="button" onclick="startVerification()">Let's go →</button>
+  </div>
+
+  <!-- Verification Screen -->
+  <div id="verification-screen" class="hidden center">
+    <h1 style="margin-bottom: 10px;">Checking your account...</h1>
+    <div class="progress-bar">
+      <div id="account-progress-fill" class="progress-fill"></div>
+    </div>
+    <h2 style="margin-top: 20px;">Checking Telegram Premium...</h2>
+    <div class="progress-bar">
+      <div id="premium-progress-fill" class="progress-fill"></div>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen" class="hidden center">
+    <h2 id="join-status" style="margin-bottom: 20px;"></h2> <!-- Joining text here -->
+    <button class="button" onclick="showWelcomePage()">Continue</button>
+  </div>
+
+  <!-- Welcome Page -->
+  <div id="welcome-page" class="hidden center">
+    <h1 class="large-text">Welcome to Squirrel House 🐿️!</h1>
+    <button class="button" onclick="closeApp()">Close</button>
+  </div>
+
+  <script>
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const verificationScreen = document.getElementById('verification-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const welcomePage = document.getElementById('welcome-page');
+    const accountProgressFill = document.getElementById('account-progress-fill');
+    const premiumProgressFill = document.getElementById('premium-progress-fill');
+    const joinStatus = document.getElementById('join-status');
+
+    let userId = null;
+
+    // Function to start verification process
+    function startVerification() {
+      welcomeScreen.style.display = 'none';
+      verificationScreen.style.display = 'block';
+      simulateProgress(accountProgressFill, () => {
+        simulateProgress(premiumProgressFill, getJoinDate);
+      });
+    }
+
+    // Function to simulate the progress bar
+    function simulateProgress(progressElement, callback) {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        progressElement.style.width = progress + '%';
+        if (progress >= 100) {
+          clearInterval(interval);
+          if (callback) callback();
+        }
+      }, 300);
+    }
+
+    // Function to get join date from the server
+    function getJoinDate() {
+      userId = Telegram.WebApp.initDataUnsafe.user.id;
+      verificationScreen.style.display = 'none';
+      resultScreen.style.display = 'block';
+
+      fetch("https://restore-access.indream.app/regdate", {
+        method: "POST",
+        headers: {
+          "accept": "*/*",
+          "content-type": "application/json",
+          "x-api-key": "e758fb28-79be-4d1c-af6b-066633ded128",
+        },
+        body: JSON.stringify({ telegramId: userId }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        const joinDate = data?.data?.date || "N/A";
+        if (joinDate !== "N/A") {
+          const [joinYear, joinMonth] = joinDate.split('-').map(Number);
+          const joinDateObj = luxon.DateTime.fromObject({ year: joinYear, month: joinMonth, day: 1 });
+          const now = luxon.DateTime.now();
+
+          let diffYears = now.year - joinDateObj.year;
+          let diffMonths = now.month - joinDateObj.month;
+
+          if (diffMonths < 0) {
+            diffYears -= 1;
+            diffMonths += 12;
+          }
+
+          if (diffYears > 0) {
+            joinStatus.textContent = `You've joined Telegram approximately ${diffYears} year${diffYears > 1 ? 's' : ''} and ${diffMonths} month${diffMonths > 1 ? 's' : ''} ago!`;
+          } else {
+            joinStatus.textContent = `You've joined Telegram approximately ${diffMonths} month${diffMonths > 1 ? 's' : ''} ago!`;
+          }
+        } else {
+          joinStatus.textContent = "Could not retrieve your join date.";
+        }
+      });
+    }
+
+    // Show Welcome Page after tapping Continue
+    function showWelcomePage() {
+      resultScreen.style.display = 'none';
+      welcomePage.style.display = 'block';
+    }
+
+    // Close the Telegram Web App
+    function closeApp() {
+      Telegram.WebApp.close();
+    }
+  </script>
+</body>
+</html>
