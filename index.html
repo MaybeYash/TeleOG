@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Join Date Checker</title>
+  <title>Telegram Squirrel 🐿️</title>
   <style>
     body {
       display: flex;
@@ -128,21 +128,16 @@
       verificationScreen.style.display = 'none';
       resultScreen.style.display = 'block';
 
-      fetch(`https://checking-join.vercel.app/check?user=${userId}`, {
-        method: "GET",
-        headers: {
-          "accept": "*/*",
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-        const message = data?.message || "Could not retrieve your join date.";
-        joinStatus.textContent = message; // Display the message directly
-      })
-      .catch(error => {
-        joinStatus.textContent = "Error retrieving join date.";
-        console.error(error);
-      });
+      fetch(`https://checking-join.vercel.app/check?user=${userId}`) // Use backticks for template literal
+        .then(response => response.json())
+        .then(data => {
+          const message = data?.message || "Could not retrieve your join date.";
+          joinStatus.textContent = message; // Display the message directly
+        })
+        .catch(error => {
+          joinStatus.textContent = "Error retrieving join date.";
+          console.error("Error:", error); // Log error message
+        });
     }
 
     // Show Welcome Page after tapping Continue
