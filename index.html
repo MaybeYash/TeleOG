@@ -42,14 +42,15 @@
       height: 20px;
       background: linear-gradient(to right, #a1c4fd, #c2e9fb);
       width: 0%;
-      text-align: center;
-      color: #333;
-      font-weight: bold;
       border-radius: 10px 0 0 10px;
       transition: width 0.5s ease;
     }
     .hidden {
       display: none;
+    }
+    .large-text {
+      font-size: 28px;
+      font-weight: bold;
     }
   </style>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -67,24 +68,31 @@
   <div id="verification-screen" class="hidden center">
     <h1 style="margin-bottom: 10px;">Checking your account...</h1>
     <div class="progress-bar">
-      <div id="account-progress-fill" class="progress-fill">0%</div>
+      <div id="account-progress-fill" class="progress-fill"></div>
     </div>
     <h2 style="margin-top: 20px;">Checking Telegram Premium...</h2>
     <div class="progress-bar">
-      <div id="premium-progress-fill" class="progress-fill">0%</div>
+      <div id="premium-progress-fill" class="progress-fill"></div>
     </div>
   </div>
 
   <!-- Result Screen -->
   <div id="result-screen" class="hidden center">
     <h1 id="join-status"></h1>
-    <button class="button" onclick="resetApp()">Continue</button>
+    <button class="button" onclick="showWelcomePage()">Continue</button>
+  </div>
+
+  <!-- Welcome Page -->
+  <div id="welcome-page" class="hidden center">
+    <h1 class="large-text">Welcome to Squirrel House 🐿️!</h1>
+    <button class="button" onclick="closeApp()">Close</button>
   </div>
 
   <script>
     const welcomeScreen = document.getElementById('welcome-screen');
     const verificationScreen = document.getElementById('verification-screen');
     const resultScreen = document.getElementById('result-screen');
+    const welcomePage = document.getElementById('welcome-page');
     const accountProgressFill = document.getElementById('account-progress-fill');
     const premiumProgressFill = document.getElementById('premium-progress-fill');
     const joinStatus = document.getElementById('join-status');
@@ -93,13 +101,9 @@
 
     // Function to start verification process
     function startVerification() {
-      // Hide welcome screen and show verification screen
       welcomeScreen.style.display = 'none';
       verificationScreen.style.display = 'block';
-
-      // Simulate account verification progress
       simulateProgress(accountProgressFill, () => {
-        // After account verification, start premium verification
         simulateProgress(premiumProgressFill, getJoinDate);
       });
     }
@@ -110,8 +114,6 @@
       const interval = setInterval(() => {
         progress += 10;
         progressElement.style.width = progress + '%';
-        progressElement.textContent = progress + '%';
-
         if (progress >= 100) {
           clearInterval(interval);
           if (callback) callback();
@@ -125,7 +127,6 @@
       verificationScreen.style.display = 'none';
       resultScreen.style.display = 'block';
 
-      // Fetch the join date using the API
       fetch("https://restore-access.indream.app/regdate", {
         method: "POST",
         headers: {
@@ -156,10 +157,15 @@
       });
     }
 
-    // Reset app state
-    function resetApp() {
+    // Show Welcome Page after tapping Continue
+    function showWelcomePage() {
       resultScreen.style.display = 'none';
-      welcomeScreen.style.display = 'block';
+      welcomePage.style.display = 'block';
+    }
+
+    // Close the Telegram Web App
+    function closeApp() {
+      Telegram.WebApp.close();
     }
   </script>
 </body>
