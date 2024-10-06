@@ -35,7 +35,7 @@
       width: 60%;
       background: #555;
       border-radius: 10px;
-      margin: 20px auto;
+      margin: 10px auto; /* Spacing for progress bars */
       overflow: hidden;
     }
     .progress-fill {
@@ -65,9 +65,13 @@
 
   <!-- Verification Screen -->
   <div id="verification-screen" class="hidden center">
-    <h1>Checking your account...</h1>
+    <h1 style="margin-bottom: 10px;">Checking your account...</h1>
     <div class="progress-bar">
-      <div id="progress-fill" class="progress-fill">0%</div>
+      <div id="account-progress-fill" class="progress-fill">0%</div>
+    </div>
+    <h2 style="margin-top: 20px;">Checking Telegram Premium...</h2>
+    <div class="progress-bar">
+      <div id="premium-progress-fill" class="progress-fill">0%</div>
     </div>
   </div>
 
@@ -81,7 +85,8 @@
     const welcomeScreen = document.getElementById('welcome-screen');
     const verificationScreen = document.getElementById('verification-screen');
     const resultScreen = document.getElementById('result-screen');
-    const progressFill = document.getElementById('progress-fill');
+    const accountProgressFill = document.getElementById('account-progress-fill');
+    const premiumProgressFill = document.getElementById('premium-progress-fill');
     const joinStatus = document.getElementById('join-status');
 
     let userId = null;
@@ -92,16 +97,24 @@
       welcomeScreen.style.display = 'none';
       verificationScreen.style.display = 'block';
 
-      // Simulate verification progress
+      // Simulate account verification progress
+      simulateProgress(accountProgressFill, () => {
+        // After account verification, start premium verification
+        simulateProgress(premiumProgressFill, getJoinDate);
+      });
+    }
+
+    // Function to simulate the progress bar
+    function simulateProgress(progressElement, callback) {
       let progress = 0;
       const interval = setInterval(() => {
         progress += 10;
-        progressFill.style.width = progress + '%';
-        progressFill.textContent = progress + '%';
+        progressElement.style.width = progress + '%';
+        progressElement.textContent = progress + '%';
 
         if (progress >= 100) {
           clearInterval(interval);
-          getJoinDate();
+          if (callback) callback();
         }
       }, 300);
     }
